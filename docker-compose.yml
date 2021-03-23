@@ -1,4 +1,7 @@
 version: "3"
+networks:
+  microservice-network:
+    driver: bridge
 
 services:
   db:
@@ -10,7 +13,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=dionis
       - MONGO_INITDB_ROOT_PASSWORD=dionis98
     restart: always
-
+    networks:
+      - microservice-network
 
   project:
     image: projectimage:latest
@@ -20,3 +24,5 @@ services:
     ports:
       - 8981:8981
     restart: always
+    networks:
+      - microservice-network
