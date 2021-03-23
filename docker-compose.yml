@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - 27012:27012
+    command: mongod --port 27012
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dionis
+      - MONGO_INITDB_ROOT_PASSWORD=dionis98
+    restart: always
+
+
+  project:
+    image: projectimage:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8981:8981
+    restart: always
