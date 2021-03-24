@@ -11,7 +11,7 @@ ADD pom.xml $HOME
 
 COPY . $HOME
 
-RUN --mount=type=cache,target=/root/.m2 mvn -f pom.xml clean install
+RUN --mount=type=cache,target=/root/.m2 mvn -f pom.xml clean install -DskipTests
 #----------------------------
 FROM adoptopenjdk/openjdk14:jre-14.0.2_12-alpine
 
