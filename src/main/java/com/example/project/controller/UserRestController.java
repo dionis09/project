@@ -47,6 +47,8 @@ public class UserRestController {
         try {
             return userRepository.findById(id);
         } catch (Exception e) {
+            e.printStackTrace();
+            log.info(e.getMessage());
             return Optional.empty();
         }
     }

@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 @EnableMongoRepositories
-@EnableAutoConfiguration
 public class ProjectApplication {
 
 	public static void main(String[] args) {
