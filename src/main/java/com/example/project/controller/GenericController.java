@@ -30,8 +30,9 @@ public class GenericController {
             genericRepository.insert(obj);
             return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("ERROR ADD GENERIC {}", obj.getObj(), e);
-            return new ResponseEntity<>(new JsonMessage("ERROR"), HttpStatus.CONFLICT);
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(new JsonMessage("ERROR "), HttpStatus.CONFLICT);
         }
     }
 
@@ -42,17 +43,7 @@ public class GenericController {
 
     @GetMapping(ID)
     public Optional<Generic> getById(@PathVariable String id) {
-        try {
-            if (genericRepository.findById(id).isPresent()) {
                 return genericRepository.findById(id);
-            } else {
-                return Optional.empty();
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-            log.error(e.getMessage());
-            return Optional.empty();
-        }
     }
 
     @DeleteMapping(ID)
@@ -67,7 +58,7 @@ public class GenericController {
     }
 
     @PutMapping(ID)
-    public ResponseEntity<JsonMessage> put(@PathVariable String id, @RequestBody Generic generic) throws Exception {
+    public ResponseEntity<JsonMessage> put(@PathVariable String id, @RequestBody Generic generic) {
         try {
             Optional<Generic> obj = genericRepository.findById(id);
             if (obj.isPresent()) {
@@ -75,11 +66,11 @@ public class GenericController {
                 genericRepository.save(generic);
                 return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
             } else {
-               throw  new Exception();
+                return new ResponseEntity<>(new JsonMessage("User not present on db"), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            log.error("ERROR UPDATE GENERIC {} AND ID{}", generic.getObj(),id, e);
-            return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.CONFLICT);
+            log.error("ERROR UPDATE GENERIC {} AND ID {}", generic.getObj(),id, e);
+            return new ResponseEntity<>(new JsonMessage("ERROR"), HttpStatus.CONFLICT);
         }
     }
 
