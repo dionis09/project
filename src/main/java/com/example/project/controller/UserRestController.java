@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -18,17 +19,13 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @EnableScheduling
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
 
-    private final String ALL = "/all";
-    private final String UPDATE = "/update";
-    private final String DELETE = "/delete/{id}";
-    private final String ADD = "/add";
-    private final String GET_BY_ID = "/getId/{id}";
+    private final String USER_ID = "/{id}";
     private final String GET_BY_USERNAME = "/getUsername/{username}";
 
     @PostConstruct
@@ -42,63 +39,46 @@ public class UserRestController {
         }
     }
 
-    @GetMapping(GET_BY_ID)
+    @GetMapping(USER_ID)
     public Optional<User> getById(@PathVariable String id) {
-        try {
-            return userRepository.findById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            return Optional.empty();
-        }
+        return userRepository.findById(id);
     }
 
     @GetMapping(GET_BY_USERNAME)
     public Optional<User> getByUsername(@PathVariable String username) {
-        try {
-            return userRepository.findByUsername(username);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            return Optional.empty();
-        }
+        return userRepository.findByUsername(username);
     }
 
-    @GetMapping(ALL)
+    @GetMapping()
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    @PostMapping(ADD)
+
+    @PostMapping()
     public ResponseEntity<JsonMessage> add(@RequestBody User user) {
         try {
-            Optional<User> username = userRepository.findByUsername(user.getUsername());
-            Optional<User> userFiscalcode = userRepository.findByFiscalCode(user.getFiscalCode());
+            Optional<User> username = userRepository.findByUsernameOrFiscalCode(user.getUsername(), user.getFiscalCode());
             if (username.isEmpty()) {
-                if (userFiscalcode.isEmpty()) {
-                    if (user.getUsername().isBlank() || user.getEmail().isBlank() || user.getFiscalCode().isBlank()) {
-                        return new ResponseEntity<>(new JsonMessage("Username or email or fiscalcode are empty"),
-                                HttpStatus.BAD_REQUEST);
-                    } else {
-                        userRepository.insert(user);
-                        return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
-                    }
-                } else {
-                    return new ResponseEntity<>(new JsonMessage("User with this fiscalcode already exist"),
+                if (StringUtils.isEmpty(user.getEmail().trim()) || StringUtils.isEmpty(user.getFiscalCode().trim())
+                        || StringUtils.isEmpty(user.getUsername().trim())) {
+                    return new ResponseEntity<>(new JsonMessage("Username or email or fiscalcode are empty"),
                             HttpStatus.BAD_REQUEST);
+                } else {
+                    userRepository.insert(user);
+                    return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
                 }
             } else {
-                return new ResponseEntity<>(new JsonMessage("User with this username already exist, please change it"),
+                return new ResponseEntity<>(new JsonMessage("User with this username or fiscalcode already exist, please change it"),
                         HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("ERROR ADD USER {}", user.toString(), e);
             return new ResponseEntity<>(new JsonMessage("Error"), HttpStatus.CONFLICT);
         }
     }
 
-    @PutMapping(UPDATE)
+    @PutMapping(USER_ID)
     public ResponseEntity<JsonMessage> update(@PathVariable String id, @RequestBody User userBody) {
         try {
             Optional<User> user = userRepository.findById(id);
@@ -114,13 +94,12 @@ public class UserRestController {
                 return new ResponseEntity<>(new JsonMessage("User with this id not exist"), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("ERROR UPDATE USER {}", userBody.toString(), e);
             return new ResponseEntity<>(new JsonMessage("Error, please contact administrator"), HttpStatus.OK);
         }
     }
 
-    @DeleteMapping(DELETE)
+    @DeleteMapping(USER_ID)
     public ResponseEntity<JsonMessage> delete(@PathVariable String id) {
         try {
             Optional<User> user = userRepository.findById(id);
@@ -131,8 +110,7 @@ public class UserRestController {
                 return new ResponseEntity<>(new JsonMessage("User deleted"), HttpStatus.OK);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Error");
+            log.error("ERROR DELETE USER BY ID {}", id, e);
             return new ResponseEntity<>(new JsonMessage("Error"), HttpStatus.CONFLICT);
         }
     }

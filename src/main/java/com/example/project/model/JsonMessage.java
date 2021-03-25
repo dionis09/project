@@ -12,5 +12,6 @@ public class JsonMessage<T> {
     private T payload;
 
     public JsonMessage(String message) {
+        this.message = message;
     }
 }

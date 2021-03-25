@@ -16,12 +16,13 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @EnableScheduling
-@RequestMapping("generic")
+@RequestMapping("/generic")
 public class GenericController {
 
     @Autowired
     private GenericRepository genericRepository;
 
+    private final String ID="/{id}";
     @PostMapping()
     public ResponseEntity<JsonMessage> insert(@RequestBody Generic obj) {
         try {
@@ -29,18 +30,17 @@ public class GenericController {
             genericRepository.insert(obj);
             return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.CONFLICT);
+            log.error("ERROR ADD GENERIC {}", obj.getObj(), e);
+            return new ResponseEntity<>(new JsonMessage("ERROR"), HttpStatus.CONFLICT);
         }
     }
 
-    @GetMapping("/getAll")
+    @GetMapping()
     public List<Generic> get() {
         return genericRepository.findAll();
     }
 
-    @GetMapping("/getById/{id}")
+    @GetMapping(ID)
     public Optional<Generic> getById(@PathVariable String id) {
         try {
             if (genericRepository.findById(id).isPresent()) {
@@ -55,20 +55,19 @@ public class GenericController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ID)
     public ResponseEntity<JsonMessage> delete(@PathVariable String id) {
         try {
             genericRepository.deleteById(id);
             return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("ERROR DELETE GENERIC BY ID {}", id, e);
             return new ResponseEntity<>(new JsonMessage("Error"), HttpStatus.CONFLICT);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<JsonMessage> put(@PathVariable String id, @RequestBody Generic generic) {
+    @PutMapping(ID)
+    public ResponseEntity<JsonMessage> put(@PathVariable String id, @RequestBody Generic generic) throws Exception {
         try {
             Optional<Generic> obj = genericRepository.findById(id);
             if (obj.isPresent()) {
@@ -76,11 +75,10 @@ public class GenericController {
                 genericRepository.save(generic);
                 return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(new JsonMessage("user not present on db"), HttpStatus.BAD_REQUEST);
+               throw  new Exception();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("ERROR UPDATE GENERIC {} AND ID{}", generic.getObj(),id, e);
             return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.CONFLICT);
         }
     }
