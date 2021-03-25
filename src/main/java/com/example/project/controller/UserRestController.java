@@ -40,8 +40,14 @@ public class UserRestController {
     }
 
     @GetMapping(USER_ID)
-    public Optional<User> getById(@PathVariable String id) {
-        return userRepository.findById(id);
+    public ResponseEntity<User> getById(@PathVariable String id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        }else{
+            log.warn("USER NOT FOUND on DB with this ID {}",id);
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(GET_BY_USERNAME)
