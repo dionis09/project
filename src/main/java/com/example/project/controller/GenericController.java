@@ -42,9 +42,15 @@ public class GenericController {
 
     @GetMapping("/getById/{id}")
     public Optional<Generic> getById(@PathVariable String id) {
-        if (genericRepository.findById(id).isPresent()) {
-            return genericRepository.findById(id);
-        } else {
+        try {
+            if (genericRepository.findById(id).isPresent()) {
+                return genericRepository.findById(id);
+            } else {
+                return Optional.empty();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            log.info(e.getMessage());
             return Optional.empty();
         }
     }
