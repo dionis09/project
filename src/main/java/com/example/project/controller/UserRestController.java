@@ -48,7 +48,7 @@ public class UserRestController {
             return userRepository.findById(id);
         } catch (Exception e) {
             e.printStackTrace();
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -59,7 +59,7 @@ public class UserRestController {
             return userRepository.findByUsername(username);
         } catch (Exception e) {
             e.printStackTrace();
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -93,7 +93,7 @@ public class UserRestController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return new ResponseEntity<>(new JsonMessage("Error"), HttpStatus.CONFLICT);
         }
     }
@@ -115,7 +115,7 @@ public class UserRestController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return new ResponseEntity<>(new JsonMessage("Error, please contact administrator"), HttpStatus.OK);
         }
     }
@@ -132,7 +132,7 @@ public class UserRestController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("Error");
+            log.error("Error");
             return new ResponseEntity<>(new JsonMessage("Error"), HttpStatus.CONFLICT);
         }
     }

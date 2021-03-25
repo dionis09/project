@@ -50,7 +50,7 @@ public class GenericController {
             }
         }catch(Exception e){
             e.printStackTrace();
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return Optional.empty();
         }
     }
