@@ -1,6 +1,8 @@
 package com.example.project.controller;
 
+import com.example.project.engine.Producer;
 import com.example.project.model.JsonMessage;
+import com.example.project.model.Storic;
 import com.example.project.model.User;
 import com.example.project.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,13 @@ public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private Producer producer;
+
+    @Autowired
+    UserRestController(Producer producer) {
+        this.producer = producer;
+    }
 
     private final String USER_ID = "/{id}";
     private final String GET_BY_USERNAME = "/getUsername/{username}";
@@ -64,6 +73,7 @@ public class UserRestController {
     @PostMapping()
     public ResponseEntity<JsonMessage> add(@RequestBody User user) {
         try {
+            Storic storic=new Storic();
             Optional<User> username = userRepository.findByUsernameOrFiscalCode(user.getUsername(), user.getFiscalCode());
             if (username.isEmpty()) {
                 if (StringUtils.isEmpty(user.getEmail().trim()) || StringUtils.isEmpty(user.getFiscalCode().trim())
@@ -71,7 +81,12 @@ public class UserRestController {
                     return new ResponseEntity<>(new JsonMessage("Username or email or fiscalcode are empty"),
                             HttpStatus.BAD_REQUEST);
                 } else {
+                    user.setCreation(LocalDateTime.now());
                     userRepository.insert(user);
+                    storic.setDate(LocalDateTime.now());
+                    storic.setNewUser(user);
+                    storic.setDetails("Insert User");
+                    this.producer.sendMessage(storic);
                     return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
                 }
             } else {
@@ -87,6 +102,7 @@ public class UserRestController {
     @PutMapping(USER_ID)
     public ResponseEntity<JsonMessage> update(@PathVariable String id, @RequestBody User userBody) {
         try {
+            Storic storic =new Storic();
             Optional<User> user = userRepository.findById(id);
             if (user.isPresent()) {
                 if (userBody.getUsername().isBlank() || userBody.getEmail().isBlank() || userBody.getFiscalCode().isBlank()) {
@@ -94,6 +110,11 @@ public class UserRestController {
                 }
                 userBody.setId(user.get().getId());
                 userRepository.save(userBody);
+                storic.setDate(LocalDateTime.now());
+                storic.setNewUser(userBody);
+                storic.setOldUser(user.get());
+                storic.setDetails("Updated User");
+                this.producer.sendMessage(storic);
                 return new ResponseEntity<>(new JsonMessage("User updated"), HttpStatus.OK);
 
             } else {

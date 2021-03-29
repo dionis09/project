@@ -9,23 +9,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends ObjectMongo {
+@SuperBuilder
+public class Storic extends ObjectMongo{
 
-    private String username = "";
-    private String name = "", surname = "", phone = " ", fiscalCode = "";
-    private String email = "";
-    private List<Address> address = new ArrayList<>();
+    private User newUser;
+    private User oldUser;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime creation;
-
+    private LocalDateTime date;
+    private String details;
 }
