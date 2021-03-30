@@ -14,13 +14,13 @@ public class UserDeserializer implements Deserializer {
     @Override
     public Object deserialize(String s, byte[] bytes) {
         ObjectMapper objectMapper=new ObjectMapper();
-        Storic storic=new Storic();
+        User user=new User();
         try{
-            storic=objectMapper.readValue(bytes,Storic.class);
+            user=objectMapper.readValue(bytes,User.class);
         }catch (Exception e){
             e.printStackTrace();
         }
-        return storic;
+        return user;
     }
 
     @Override

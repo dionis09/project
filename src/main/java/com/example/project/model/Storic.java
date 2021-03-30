@@ -19,8 +19,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class Storic extends ObjectMongo{
 
-    private User newUser;
-    private User oldUser;
+    private User user;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime date;

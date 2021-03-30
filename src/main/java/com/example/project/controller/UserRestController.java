@@ -73,7 +73,6 @@ public class UserRestController {
     @PostMapping()
     public ResponseEntity<JsonMessage> add(@RequestBody User user) {
         try {
-            Storic storic=new Storic();
             Optional<User> username = userRepository.findByUsernameOrFiscalCode(user.getUsername(), user.getFiscalCode());
             if (username.isEmpty()) {
                 if (StringUtils.isEmpty(user.getEmail().trim()) || StringUtils.isEmpty(user.getFiscalCode().trim())
@@ -83,10 +82,7 @@ public class UserRestController {
                 } else {
                     user.setCreation(LocalDateTime.now());
                     userRepository.insert(user);
-                    storic.setDate(LocalDateTime.now());
-                    storic.setNewUser(user);
-                    storic.setDetails("Insert User");
-                    this.producer.sendMessage(storic);
+                    this.producer.sendMessage(user);
                     return new ResponseEntity<>(new JsonMessage("Performed"), HttpStatus.OK);
                 }
             } else {
@@ -102,7 +98,6 @@ public class UserRestController {
     @PutMapping(USER_ID)
     public ResponseEntity<JsonMessage> update(@PathVariable String id, @RequestBody User userBody) {
         try {
-            Storic storic =new Storic();
             Optional<User> user = userRepository.findById(id);
             if (user.isPresent()) {
                 if (userBody.getUsername().isBlank() || userBody.getEmail().isBlank() || userBody.getFiscalCode().isBlank()) {
@@ -110,11 +105,7 @@ public class UserRestController {
                 }
                 userBody.setId(user.get().getId());
                 userRepository.save(userBody);
-                storic.setDate(LocalDateTime.now());
-                storic.setNewUser(userBody);
-                storic.setOldUser(user.get());
-                storic.setDetails("Updated User");
-                this.producer.sendMessage(storic);
+                this.producer.sendMessage(userBody);
                 return new ResponseEntity<>(new JsonMessage("User updated"), HttpStatus.OK);
 
             } else {

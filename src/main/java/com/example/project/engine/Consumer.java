@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class Consumer {
@@ -23,8 +24,16 @@ public class Consumer {
     private UserRepository userRepository;
 
     @KafkaListener(topics = "users", groupId = "group_id")
-    public void consume(Storic storic) throws IOException {
+    public void consume(User user) throws IOException {
+        Storic storic=new Storic();
+        storic.setDate(LocalDateTime.now());
+        storic.setUser(user);
+        if (user.getCreation().truncatedTo(ChronoUnit.MINUTES).isEqual(storic.getDate().truncatedTo(ChronoUnit.MINUTES))){
+            storic.setDetails("Insert User");
+        }else {
+            storic.setDetails("Updated user");
+        }
         storicRepository.insert(storic);
-        logger.info(String.format("#### -> Consumed idUser -> %s", storic.getNewUser().getId()));
+        logger.info(String.format("#### -> Consumed idUser -> %s", user.getId()));
     }
 }

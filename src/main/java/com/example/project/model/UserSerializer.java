@@ -13,11 +13,11 @@ public class UserSerializer implements Serializer {
     }
 
     @Override
-    public byte[] serialize(String s, Object storic) {
+    public byte[] serialize(String s, Object user) {
         byte[] retVal = new byte[0];
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            retVal = objectMapper.writeValueAsString(storic).getBytes();
+            retVal = objectMapper.writeValueAsString(user).getBytes();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
